@@ -8,6 +8,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import Password from "@/components/ui/Password";
 import { cn } from "@/lib/utils";
 import { useLoginMutation } from "@/redux/features/auth/auth.api";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -72,25 +73,20 @@ export function LoginForm({
               )}
             />
 
-            <FormField
+           <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="********"
-                      {...field}
-                      required
-                      value={field.value || ""}
-                    />
+                    <Password {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            
 
             <Button type="submit" className="w-full">
               Login
