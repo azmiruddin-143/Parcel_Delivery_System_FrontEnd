@@ -46,6 +46,13 @@ export const authApi = baseApi.injectEndpoints({
       }),
       providesTags: ["USER"],
     }),
+    parcel: builder.mutation({
+      query: (parcelInfo) => ({
+        url: "/parcels",
+        method: "POST",
+        data: parcelInfo,
+      }),
+    }),
   }),
 });
 
@@ -56,4 +63,5 @@ export const {
   useVerifyOtpMutation,
   useUserInfoQuery,
   useLogoutMutation,
+  useParcelMutation
 } = authApi;
