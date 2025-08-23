@@ -15,42 +15,18 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { Link } from "react-router"
+import { getSidebarItems } from "@/utils/getSidebarItems"
+import { useUserInfoQuery } from "@/redux/features/auth/auth.api"
 
-// This is sample data.
-const data = {
-  versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "#",
-      items: [
-        {
-          title: "Analytics",
-          url: "/admin/analytics",
-        },
-       
-      ],
-    },
-    {
-      title: "Manage Users And Parcels",
-      url: "#",
-      items: [
-        {
-          title: "Manage All Users",
-          url: "/admin/manageusers",
-        },
-        {
-          title: "Manage All Parcels",
-          url: "/admin/manageusers",
-        },
-       
-      ],
-    },
-    
-  ],
-}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+const { data:userData } = useUserInfoQuery(undefined)
+console.log(userData?.data?.email);
+// This is sample data.
+const data = {
+  navMain: getSidebarItems(userData?.data?.role)
+}
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>

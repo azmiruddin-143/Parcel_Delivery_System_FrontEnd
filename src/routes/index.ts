@@ -1,13 +1,13 @@
 import App from "@/App";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import About from "@/pages/About";
-import Analytics from "@/pages/Admin/Analytics";
-import ManageAllUsers from "@/pages/Admin/ManageAllUsers";
 import Login from "@/pages/Login";
-import ConfirmParcelDelivery from "@/pages/Receiver/ConfirmParcelDelivery";
 import Register from "@/pages/Register";
-import ParcelCreate from "@/pages/Sender/ParcelCreate";
+import { generateRoutes } from "@/utils/generateRoutes";
 import { createBrowserRouter } from "react-router";
+import { adminSidebarItems } from "./AdminSidebarItems";
+import { senderSidebarItems } from "./senderSidebarItem";
+import { receiverSidebarItems } from "./receiverSideItem";
 
 export const router = createBrowserRouter([
     {
@@ -15,44 +15,26 @@ export const router = createBrowserRouter([
         path: "/",
         children: [
             {
-                Component:About,
-                path: "about", 
+                Component: About,
+                path: "about",
             },
         ],
     },
     {
         Component: DashboardLayout,
         path: "/admin",
-        children: [
-            {
-                Component:ManageAllUsers,
-                path: "manageusers", 
-            },
-            {
-                Component:Analytics,
-                path: "analytics", 
-            },
-        ],
+        children: [...generateRoutes(adminSidebarItems)]
+
     },
     {
         Component: DashboardLayout,
         path: "/sender",
-        children: [
-            {
-                Component:ParcelCreate,
-                path: "parcelcreate", 
-            },
-        ],
+        children: [...generateRoutes(senderSidebarItems)]
     },
     {
         Component: DashboardLayout,
         path: "/receiver",
-        children: [
-            {
-                Component:ConfirmParcelDelivery,
-                path: "confirmparcel", 
-            },
-        ],
+        children: [...generateRoutes(receiverSidebarItems)]
     },
 
     {
@@ -63,5 +45,5 @@ export const router = createBrowserRouter([
         Component: Register,
         path: "/register",
     }
-   
+
 ]);
