@@ -3,6 +3,7 @@ import { baseApi } from "@/redux/base.api";
 import { IResponse, ISendOtp, IVerifyOtp } from "@/type";
 
 export const authApi = baseApi.injectEndpoints({
+
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (userInfo) => ({
@@ -16,7 +17,7 @@ export const authApi = baseApi.injectEndpoints({
         url: "/auth/logout",
         method: "POST",
       }),
-      invalidatesTags: ["USER"],
+      invalidatesTags: ["User"],
     }),
     register: builder.mutation({
       query: (userInfo) => ({
@@ -44,7 +45,7 @@ export const authApi = baseApi.injectEndpoints({
         url: "/users/me",
         method: "GET",
       }),
-      providesTags: ["USER"],
+      providesTags: ["User"],
     }),
     parcel: builder.mutation({
       query: (parcelInfo) => ({
@@ -58,10 +59,12 @@ export const authApi = baseApi.injectEndpoints({
         url: "/parcels/allparcels",
         method: "GET",
       }),
+       providesTags: ["Parcel"], 
+      
     }),
     updateParcelStatus: builder.mutation({
-      query: ({ parcelId, status, location, note }) => ({ // এখানে প্যারামিটারগুলো ডিস্ট্রাকচার করা হয়েছে
-        url: `/parcels/${parcelId}/status`, // <-- আপনার নির্দিষ্ট URL এখানে
+      query: ({ parcelId, status, location, note }) => ({
+        url: `/parcels/${parcelId}/status`, 
         method: 'PATCH',
         data: {
           status,
@@ -69,8 +72,25 @@ export const authApi = baseApi.injectEndpoints({
           note
         },
       }),
-      invalidatesTags: ['PARCEL'], // এটি নিশ্চিত করবে যে ডেটা আপডেট হলে পুনরায় আনা হবে
+       invalidatesTags: ["Parcel"]
     }),
+     // --- New mutation for blocking a parcel ---
+    blockParcel: builder.mutation({
+      query: (parcelId) => ({
+        url: `/parcels/${parcelId}/block`, 
+        method: 'PATCH',
+      }),
+      invalidatesTags: ["Parcel"] 
+    }),
+
+    unblockParcel: builder.mutation({
+      query: (parcelId) => ({
+        url: `/parcels/${parcelId}/unblock`, 
+        method: 'PATCH',
+      }),
+      invalidatesTags: ["Parcel"]
+    }),
+
   }),
 });
 
@@ -83,5 +103,7 @@ export const {
   useLogoutMutation,
   useParcelMutation,
   useAllparcelsQuery,
-  useUpdateParcelStatusMutation
+  useUpdateParcelStatusMutation,
+  useBlockParcelMutation, 
+  useUnblockParcelMutation 
 } = authApi;

@@ -355,6 +355,362 @@
 
 
 
+// import * as React from "react";
+// import {
+//     ColumnDef,
+//     flexRender,
+//     getCoreRowModel,
+//     getFilteredRowModel,
+//     getPaginationRowModel,
+//     useReactTable,
+// } from "@tanstack/react-table";
+// import { Badge } from "@/components/ui/badge";
+// import {
+//     Table,
+//     TableBody,
+//     TableCell,
+//     TableHead,
+//     TableHeader,
+//     TableRow,
+// } from "@/components/ui/table";
+// import { Input } from "@/components/ui/input";
+// import { Button } from "@/components/ui/button";
+// import { useAllparcelsQuery } from "@/redux/features/auth/auth.api";
+// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+// import {
+//     DropdownMenu,
+//     DropdownMenuContent,
+//     DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu";
+// import {
+//     DropdownMenuCheckboxItem,
+// } from "@/components/ui/dropdown-menu";
+// import {
+//     DropdownMenuItem,
+//     DropdownMenuLabel,
+//     DropdownMenuSeparator,
+// } from "@/components/ui/dropdown-menu";
+// import { MoreHorizontal, ChevronDown } from "lucide-react";
+// import {
+//     Dialog,
+//     DialogContent,
+//     DialogDescription,
+//     DialogHeader,
+//     DialogTitle,
+//     DialogTrigger,
+// } from "@/components/ui/dialog";
+// import { StatusUpdateForm } from "./StatusUpdateForm";
+
+// // Define the Parcel type to match your API response
+// type Parcel = {
+//     _id: string;
+//     id: string;
+//     trackingId: string;
+//     currentStatus: string;
+//     isBlocked: boolean;
+//     parcelType: string;
+//     weight: number;
+//     deliveryAddress: string;
+//     receiver: {
+//         name: string;
+//         email: string;
+//         phone: string;
+//     };
+//     sender: {
+//         name: string;
+//         email: string;
+//     };
+// };
+
+// const getStatusBadgeVariant = (status: string) => {
+//     switch (status) {
+//         case "Requested":
+//             return "default";
+//         case "Delivered":
+//             return "secondary";
+//         case "Cancelled":
+//         case "Returned":
+//         case "Held":
+//             return "destructive";
+//         case "Approved":
+//         case "Dispatched":
+//         case "In Transit":
+//         case "Picked":
+//             return "default";
+//         default:
+//             return "outline";
+//     }
+// };
+
+// const ManageAllParcels = () => {
+//     // Hooks must be called inside the component
+//     const { data: allParcels, isLoading, isError } = useAllparcelsQuery(undefined);
+//     const [globalFilter, setGlobalFilter] = React.useState("");
+//     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+//     const [selectedParcel, setSelectedParcel] = React.useState<Parcel | null>(null);
+
+//     const handleStatusUpdate = (updatedParcelData: Parcel) => {
+//         console.log("Parcel status updated:", updatedParcelData);
+//         setIsDialogOpen(false);
+//         // You would typically re-fetch data or update the cache here
+//     };
+
+//     const tableData = React.useMemo(() => allParcels?.data?.data || [], [allParcels]);
+
+//     // Define columns inside the component to access state and handlers
+//     const columns: ColumnDef<Parcel>[] = [
+//         {
+//             accessorKey: "trackingId",
+//             header: "Tracking ID",
+//         },
+//         {
+//             accessorKey: "parcelType",
+//             header: "Parcel Type",
+//         },
+//         {
+//             accessorKey: "sender.name",
+//             header: "Sender Name",
+//             cell: ({ row }) => <span>{row.original.sender.name}</span>,
+//         },
+//         {
+//             accessorKey: "sender.email",
+//             header: "Sender Email",
+//             cell: ({ row }) => <span>{row.original.sender.email}</span>,
+//         },
+//         {
+//             accessorKey: "receiver.name",
+//             header: "Receiver Name",
+//             cell: ({ row }) => <span>{row.original.receiver.name}</span>,
+//         },
+//         {
+//             accessorKey: "receiver.email",
+//             header: "Receiver Email",
+//             cell: ({ row }) => <span>{row.original.receiver.email}</span>,
+//         },
+//         {
+//             accessorKey: "receiver.phone",
+//             header: "Receiver Phone",
+//             cell: ({ row }) => <span>{row.original.receiver.phone}</span>,
+//         },
+//         {
+//             accessorKey: "currentStatus",
+//             header: "Status",
+//             cell: ({ row }) => {
+//                 const status = row.getValue("currentStatus") as string;
+//                 return <Badge variant={getStatusBadgeVariant(status)}>{status}</Badge>;
+//             },
+//         },
+//         {
+//             accessorKey: "weight",
+//             header: "Weight (kg)",
+//         },
+//         {
+//             accessorKey: "deliveryAddress",
+//             header: "Delivery Address",
+//         },
+//         {
+//             accessorKey: "isBlocked",
+//             header: "Block Status",
+//             cell: ({ row }) => (
+//                 <Badge variant={row.original.isBlocked ? "destructive" : "secondary"}>
+//                     {row.original.isBlocked ? "Blocked" : "Active"}
+//                 </Badge>
+//             ),
+//         },
+//         {
+//             id: "actions",
+//             cell: ({ row }) => {
+//                 const parcel = row.original;
+//                 return (
+//                     <DropdownMenu>
+//                         <DropdownMenuTrigger asChild>
+//                             <Button variant="ghost" className="h-8 w-8 p-0">
+//                                 <span className="sr-only">Open menu</span>
+//                                 <MoreHorizontal className="h-4 w-4" />
+//                             </Button>
+//                         </DropdownMenuTrigger>
+//                         <DropdownMenuContent align="end">
+//                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+//                             {/* Dialog is now rendered here conditionally */}
+//                             <Dialog open={isDialogOpen && selectedParcel?._id === parcel._id} onOpenChange={setIsDialogOpen}>
+//                                 <DialogTrigger asChild>
+//                                     <DropdownMenuItem onSelect={(e) => {
+//                                         e.preventDefault();
+//                                         setSelectedParcel(parcel);
+//                                         setIsDialogOpen(true);
+//                                     }}>
+//                                         Update Status 
+//                                     </DropdownMenuItem>
+//                                 </DialogTrigger>
+//                                 <DialogContent>
+//                                     <DialogHeader>
+//                                         <DialogTitle>Update Status for {selectedParcel?.trackingId}</DialogTitle>
+//                                         <DialogDescription>
+//                                             Select the new status for this parcel.
+//                                         </DialogDescription>
+//                                     </DialogHeader>
+//                                     {selectedParcel && (
+//                                         <StatusUpdateForm
+//                                             parcel={selectedParcel}
+//                                             onStatusUpdated={handleStatusUpdate}
+//                                         />
+//                                     )}
+//                                 </DialogContent>
+//                             </Dialog>
+//                             <DropdownMenuSeparator />
+//                             <DropdownMenuItem
+//                                 onClick={() => alert(`Block Parcel: ${parcel.trackingId}`)}
+//                                 disabled={parcel.isBlocked}
+//                             >
+//                                 Block Parcel
+//                             </DropdownMenuItem>
+//                             <DropdownMenuItem
+//                                 onClick={() => alert(`Unblock Parcel: ${parcel.trackingId}`)}
+//                                 disabled={!parcel.isBlocked}
+//                             >
+//                                 Unblock Parcel
+//                             </DropdownMenuItem>
+//                         </DropdownMenuContent>
+//                     </DropdownMenu>
+//                 );
+//             },
+//         },
+//     ];
+
+//     const table = useReactTable({
+//         data: tableData,
+//         columns,
+//         getCoreRowModel: getCoreRowModel(),
+//         getPaginationRowModel: getPaginationRowModel(),
+//         getFilteredRowModel: getFilteredRowModel(),
+//         state: {
+//             globalFilter,
+//         },
+//         onGlobalFilterChange: setGlobalFilter,
+//         initialState: {
+//             pagination: {
+//                 pageSize: 5,
+//             },
+//         },
+//     });
+
+//     if (isLoading) {
+//         return <div className="p-4 text-center">Loading parcels...</div>;
+//     }
+
+//     if (isError) {
+//         return <div className="p-4 text-center text-red-500">Error loading parcels. Please try again later.</div>;
+//     }
+
+//     return (
+//         <Card className="p-4">
+//             <CardHeader>
+//                 <CardTitle>All Parcels</CardTitle>
+//                 <CardDescription>Manage all incoming and outgoing parcels.</CardDescription>
+//                 <div className="flex items-center py-4 justify-between">
+//                     <Input
+//                         placeholder="Filter by name or tracking ID..."
+//                         value={globalFilter ?? ""}
+//                         onChange={(event) => setGlobalFilter(String(event.target.value))}
+//                         className="max-w-sm"
+//                     />
+//                     <DropdownMenu>
+//                         <DropdownMenuTrigger asChild>
+//                             <Button variant="outline" className="ml-auto">
+//                                 Columns <ChevronDown className="ml-2 h-4 w-4" />
+//                             </Button>
+//                         </DropdownMenuTrigger>
+//                         <DropdownMenuContent align="end">
+//                             {table
+//                                 .getAllColumns()
+//                                 .filter((column) => column.getCanHide())
+//                                 .map((column) => (
+//                                     <DropdownMenuCheckboxItem
+//                                         key={column.id}
+//                                         className="capitalize"
+//                                         checked={column.getIsVisible()}
+//                                         onCheckedChange={(value) =>
+//                                             column.toggleVisibility(!!value)
+//                                         }
+//                                     >
+//                                         {column.id}
+//                                     </DropdownMenuCheckboxItem>
+//                                 ))}
+//                         </DropdownMenuContent>
+//                     </DropdownMenu>
+//                 </div>
+//             </CardHeader>
+//             <CardContent>
+//                 <div className="rounded-md border">
+//                     <Table>
+//                         <TableHeader>
+//                             {table.getHeaderGroups().map((headerGroup) => (
+//                                 <TableRow key={headerGroup.id}>
+//                                     {headerGroup.headers.map((header) => (
+//                                         <TableHead key={header.id}>
+//                                             {header.isPlaceholder
+//                                                 ? null
+//                                                 : flexRender(
+//                                                       header.column.columnDef.header,
+//                                                       header.getContext()
+//                                                   )}
+//                                         </TableHead>
+//                                     ))}
+//                                 </TableRow>
+//                             ))}
+//                         </TableHeader>
+//                         <TableBody>
+//                             {table.getRowModel().rows?.length ? (
+//                                 table.getRowModel().rows.map((row) => (
+//                                     <TableRow
+//                                         key={row.id}
+//                                         data-state={row.getIsSelected() && "selected"}
+//                                     >
+//                                         {row.getVisibleCells().map((cell) => (
+//                                             <TableCell key={cell.id}>
+//                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
+//                                             </TableCell>
+//                                         ))}
+//                                     </TableRow>
+//                                 ))
+//                             ) : (
+//                                 <TableRow>
+//                                     <TableCell colSpan={columns.length} className="h-24 text-center">
+//                                         No results.
+//                                     </TableCell>
+//                                 </TableRow>
+//                             )}
+//                         </TableBody>
+//                     </Table>
+//                 </div>
+//                 <div className="flex items-center justify-end space-x-2 py-4">
+//                     <Button
+//                         variant="outline"
+//                         size="sm"
+//                         onClick={() => table.previousPage()}
+//                         disabled={!table.getCanPreviousPage()}
+//                     >
+//                         Previous
+//                     </Button>
+//                     <Button
+//                         variant="outline"
+//                         size="sm"
+//                         onClick={() => table.nextPage()}
+//                         disabled={!table.getCanNextPage()}
+//                     >
+//                         Next
+//                     </Button>
+//                 </div>
+//             </CardContent>
+//         </Card>
+//     );
+// };
+
+// export default ManageAllParcels;
+
+
+
+
 import * as React from "react";
 import {
     ColumnDef,
@@ -375,7 +731,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useAllparcelsQuery } from "@/redux/features/auth/auth.api";
+import { useAllparcelsQuery, useBlockParcelMutation, useUnblockParcelMutation } from "@/redux/features/auth/auth.api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     DropdownMenu,
@@ -397,30 +753,13 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
 import { StatusUpdateForm } from "./StatusUpdateForm";
+import { Parcel } from "@/type";
+import toast from "react-hot-toast";
 
-// Define the Parcel type to match your API response
-type Parcel = {
-    _id: string;
-    id: string;
-    trackingId: string;
-    currentStatus: string;
-    isBlocked: boolean;
-    parcelType: string;
-    weight: number;
-    deliveryAddress: string;
-    receiver: {
-        name: string;
-        email: string;
-        phone: string;
-    };
-    sender: {
-        name: string;
-        email: string;
-    };
-};
+// This type definition must be consistent across all files
+// type Parcel = { ... }
 
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -449,11 +788,29 @@ const ManageAllParcels = () => {
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [selectedParcel, setSelectedParcel] = React.useState<Parcel | null>(null);
 
+    const [blockParcelMutation] = useBlockParcelMutation();
+    const [unblockParcelMutation] = useUnblockParcelMutation();
+
     const handleStatusUpdate = (updatedParcelData: Parcel) => {
         console.log("Parcel status updated:", updatedParcelData);
         setIsDialogOpen(false);
         // You would typically re-fetch data or update the cache here
     };
+
+    // --- New handler functions for block/unblock ---
+    const handleBlockUnblock = async (parcelId: string, action: 'block' | 'unblock') => {
+        try {
+            const mutation = action === 'block' ? blockParcelMutation : unblockParcelMutation;
+            const result = await mutation(parcelId).unwrap();
+
+            toast.success(result.message); // Show success message from backend
+        } catch (error) {
+            console.error(error);
+            const errorMessage = error?.data?.message || `Failed to ${action} parcel.`;
+            toast.error(errorMessage);
+        }
+    };
+
 
     const tableData = React.useMemo(() => allParcels?.data?.data || [], [allParcels]);
 
@@ -531,41 +888,23 @@ const ManageAllParcels = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            {/* Dialog is now rendered here conditionally */}
-                            <Dialog open={isDialogOpen && selectedParcel?._id === parcel._id} onOpenChange={setIsDialogOpen}>
-                                <DialogTrigger asChild>
-                                    <DropdownMenuItem onSelect={(e) => {
-                                        e.preventDefault();
-                                        setSelectedParcel(parcel);
-                                        setIsDialogOpen(true);
-                                    }}>
-                                        Update Status
-                                    </DropdownMenuItem>
-                                </DialogTrigger>
-                                <DialogContent>
-                                    <DialogHeader>
-                                        <DialogTitle>Update Status for {selectedParcel?.trackingId}</DialogTitle>
-                                        <DialogDescription>
-                                            Select the new status for this parcel.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    {selectedParcel && (
-                                        <StatusUpdateForm
-                                            parcel={selectedParcel}
-                                            onStatusUpdated={handleStatusUpdate}
-                                        />
-                                    )}
-                                </DialogContent>
-                            </Dialog>
+                            {/* The DialogTrigger now sets the state */}
+                            <DropdownMenuItem onSelect={(e) => {
+                                e.preventDefault(); // Prevent the dropdown from closing
+                                setSelectedParcel(parcel);
+                                setIsDialogOpen(true);
+                            }}>
+                                Update Status
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                                onClick={() => alert(`Block Parcel: ${parcel.trackingId}`)}
+                                onClick={() => handleBlockUnblock(parcel._id, 'block')}
                                 disabled={parcel.isBlocked}
                             >
                                 Block Parcel
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => alert(`Unblock Parcel: ${parcel.trackingId}`)}
+                                onClick={() => handleBlockUnblock(parcel._id, 'unblock')}
                                 disabled={!parcel.isBlocked}
                             >
                                 Unblock Parcel
@@ -651,9 +990,9 @@ const ManageAllParcels = () => {
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                      header.column.columnDef.header,
-                                                      header.getContext()
-                                                  )}
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
                                         </TableHead>
                                     ))}
                                 </TableRow>
@@ -702,6 +1041,23 @@ const ManageAllParcels = () => {
                     </Button>
                 </div>
             </CardContent>
+            {/* The Dialog is now a top-level element, rendering conditionally */}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Update Status for {selectedParcel?.trackingId}</DialogTitle>
+                        <DialogDescription>
+                            Select the new status for this parcel.
+                        </DialogDescription>
+                    </DialogHeader>
+                    {selectedParcel && (
+                        <StatusUpdateForm
+                            parcel={selectedParcel}
+                            onStatusUpdated={handleStatusUpdate}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
         </Card>
     );
 };

@@ -20,9 +20,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
 import { useUpdateParcelStatusMutation } from "@/redux/features/auth/auth.api";
 import { Parcel } from "@/type";
+import toast from "react-hot-toast";
 const parcelStatuses = [
     "Requested",
     "Approved",
@@ -78,10 +78,15 @@ const onSubmit = async (data : ParcelFormData) => {
       const result = await updateStatus(payload).unwrap();
       
       toast.success(`Status for ${parcel.trackingId} updated to ${data.status}`);
-      onStatusUpdated(result); // এটি প্যারেন্ট কম্পোনেন্টকে জানাবে যে ডেটা আপডেট হয়েছে
+
+       
+
+      onStatusUpdated(result); 
     } catch (error) {
       console.error(error);
-      toast.error("Failed to update status. Please try again.");
+      
+      const errorMessage = error?.data?.message || "Failed to update status. Please try again.";
+      toast.error(errorMessage);
     }
   };
 
