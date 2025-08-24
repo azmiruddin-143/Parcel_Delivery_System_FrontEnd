@@ -53,6 +53,24 @@ export const authApi = baseApi.injectEndpoints({
         data: parcelInfo,
       }),
     }),
+    allparcels: builder.query({
+      query: () => ({
+        url: "/parcels/allparcels",
+        method: "GET",
+      }),
+    }),
+    updateParcelStatus: builder.mutation({
+      query: ({ parcelId, status, location, note }) => ({ // এখানে প্যারামিটারগুলো ডিস্ট্রাকচার করা হয়েছে
+        url: `/parcels/${parcelId}/status`, // <-- আপনার নির্দিষ্ট URL এখানে
+        method: 'PATCH',
+        data: {
+          status,
+          location,
+          note
+        },
+      }),
+      invalidatesTags: ['PARCEL'], // এটি নিশ্চিত করবে যে ডেটা আপডেট হলে পুনরায় আনা হবে
+    }),
   }),
 });
 
@@ -63,5 +81,7 @@ export const {
   useVerifyOtpMutation,
   useUserInfoQuery,
   useLogoutMutation,
-  useParcelMutation
+  useParcelMutation,
+  useAllparcelsQuery,
+  useUpdateParcelStatusMutation
 } = authApi;
