@@ -42,23 +42,23 @@ export const authApi = baseApi.injectEndpoints({
     }),
 
 
-     allUsers: builder.query({
+    allUsers: builder.query({
       query: () => ({
         url: "/users/allusers",
         method: "GET",
       }),
-       providesTags: ["User"], 
-      
+      providesTags: ["User"],
+
     }),
 
 
     changeUserStatus: builder.mutation({
       query: ({ userId, status }) => ({
-        url: `/users/${userId}/status`, 
+        url: `/users/${userId}/status`,
         method: 'PATCH',
         data: { status },
       }),
-      invalidatesTags: ["User"] 
+      invalidatesTags: ["User"]
     }),
 
 
@@ -83,12 +83,12 @@ export const authApi = baseApi.injectEndpoints({
         url: "/parcels/allparcels",
         method: "GET",
       }),
-       providesTags: ["Parcel"], 
-      
+      providesTags: ["Parcel"],
+
     }),
     updateParcelStatus: builder.mutation({
       query: ({ parcelId, status, location, note }) => ({
-        url: `/parcels/${parcelId}/status`, 
+        url: `/parcels/${parcelId}/status`,
         method: 'PATCH',
         data: {
           status,
@@ -96,27 +96,27 @@ export const authApi = baseApi.injectEndpoints({
           note
         },
       }),
-       invalidatesTags: ["Parcel"]
+      invalidatesTags: ["Parcel"]
     }),
-     // --- New mutation for blocking a parcel ---
+    // --- New mutation for blocking a parcel ---
     blockParcel: builder.mutation({
       query: (parcelId) => ({
-        url: `/parcels/${parcelId}/block`, 
+        url: `/parcels/${parcelId}/block`,
         method: 'PATCH',
       }),
-      invalidatesTags: ["Parcel"] 
+      invalidatesTags: ["Parcel"]
     }),
 
     unblockParcel: builder.mutation({
       query: (parcelId) => ({
-        url: `/parcels/${parcelId}/unblock`, 
+        url: `/parcels/${parcelId}/unblock`,
         method: 'PATCH',
       }),
       invalidatesTags: ["Parcel"]
     }),
 
 
- getUserStats: builder.query({
+    getUserStats: builder.query({
       query: () => ({
         url: "/users/stats",
         method: "GET",
@@ -139,7 +139,7 @@ export const authApi = baseApi.injectEndpoints({
 
     getMyParcels: builder.query({
       query: () => ({
-        url: "/parcels/my", 
+        url: "/parcels/my",
         method: "GET",
       }),
       providesTags: ["Parcel"],
@@ -147,12 +147,47 @@ export const authApi = baseApi.injectEndpoints({
 
     cancelParcel: builder.mutation({
       query: (parcelId) => ({
-        url: `/parcels/${parcelId}/cancel`, 
+        url: `/parcels/${parcelId}/cancel`,
         method: "PATCH",
       }),
       invalidatesTags: ["Parcel"],
     }),
+
+
+    //  Recever//
+    getIncomingParcels: builder.query({
+      query: () => ({
+        url: "/parcels/incoming",
+        method: "GET",
+      }),
+      providesTags: ["Parcel"],
+    }),
+
+    searchUserByEmail: builder.query({
+      query: (email) => ({
+        url: `/users/search?email=${email}`,
+        method: "GET",
+      }),
+      providesTags: ["User"],
+    }),
+
+
+    confirmParcel: builder.mutation({
+      query: (parcelId) => ({
+        url: `/parcels/${parcelId}/confirm-delivery`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Parcel"],
+    }),
+
   }),
+
+
+
+
+
+
+
 
 });
 
@@ -165,21 +200,26 @@ export const {
   useLogoutMutation,
 
   useAllUsersQuery,
-  useChangeUserStatusMutation ,
+  useChangeUserStatusMutation,
 
   useParcelMutation,
   useAllparcelsQuery,
   useUpdateParcelStatusMutation,
-  useBlockParcelMutation, 
+  useBlockParcelMutation,
   useUnblockParcelMutation,
 
- 
+
   useGetUserStatsQuery,
   useGetParcelStatsQuery,
 
-// Sender User
+  // Sender User
   useGetMyParcelsQuery,
-  useCancelParcelMutation, 
+  useCancelParcelMutation,
+
+  // Reciver
+  useGetIncomingParcelsQuery,
+  useConfirmParcelMutation,
+  useSearchUserByEmailQuery
 
 
 } = authApi;
