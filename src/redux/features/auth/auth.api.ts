@@ -40,6 +40,28 @@ export const authApi = baseApi.injectEndpoints({
         data: userInfo,
       }),
     }),
+
+
+     allUsers: builder.query({
+      query: () => ({
+        url: "/users/allusers",
+        method: "GET",
+      }),
+       providesTags: ["User"], 
+      
+    }),
+
+
+    changeUserStatus: builder.mutation({
+      query: ({ userId, status }) => ({
+        url: `/users/${userId}/status`, 
+        method: 'PATCH',
+        data: { status },
+      }),
+      invalidatesTags: ["User"] 
+    }),
+
+
     userInfo: builder.query({
       query: () => ({
         url: "/users/me",
@@ -47,6 +69,8 @@ export const authApi = baseApi.injectEndpoints({
       }),
       providesTags: ["User"],
     }),
+
+
     parcel: builder.mutation({
       query: (parcelInfo) => ({
         url: "/parcels",
@@ -101,6 +125,10 @@ export const {
   useVerifyOtpMutation,
   useUserInfoQuery,
   useLogoutMutation,
+
+  useAllUsersQuery,
+  useChangeUserStatusMutation ,
+
   useParcelMutation,
   useAllparcelsQuery,
   useUpdateParcelStatusMutation,
