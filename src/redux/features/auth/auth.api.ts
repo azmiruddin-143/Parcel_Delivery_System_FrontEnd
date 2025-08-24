@@ -134,12 +134,26 @@ export const authApi = baseApi.injectEndpoints({
 
 
 
+    // Sender User//
 
 
+    getMyParcels: builder.query({
+      query: () => ({
+        url: "/parcels/my", 
+        method: "GET",
+      }),
+      providesTags: ["Parcel"],
+    }),
 
-
-
+    cancelParcel: builder.mutation({
+      query: (parcelId) => ({
+        url: `/parcels/${parcelId}/cancel`, 
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Parcel"],
+    }),
   }),
+
 });
 
 export const {
@@ -159,7 +173,13 @@ export const {
   useBlockParcelMutation, 
   useUnblockParcelMutation,
 
-
+ 
   useGetUserStatsQuery,
   useGetParcelStatsQuery,
+
+// Sender User
+  useGetMyParcelsQuery,
+  useCancelParcelMutation, 
+
+
 } = authApi;
