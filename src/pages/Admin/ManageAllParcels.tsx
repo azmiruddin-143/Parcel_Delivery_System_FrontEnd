@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useAllparcelsQuery, useBlockParcelMutation, useUnblockParcelMutation } from "@/redux/features/auth/auth.api";
+import { useAllparcelsQuery, useBlockParcelMutation, useGetSingleParcelQuery, useUnblockParcelMutation } from "@/redux/features/auth/auth.api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     DropdownMenu,
@@ -76,13 +76,26 @@ const ManageAllParcels = () => {
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [selectedParcel, setSelectedParcel] = React.useState<Parcel | null>(null);
 
+    const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
+    const [selectedParcelId, setSelectedParcelId] = React.useState<string | null>(null);
+
+    const { data: singleParcelData, isLoading: singleParcelLoading } = useGetSingleParcelQuery(selectedParcelId, {
+        skip: !selectedParcelId,
+    });
+
+
+
+
+
+
+
     const [blockParcelMutation] = useBlockParcelMutation();
     const [unblockParcelMutation] = useUnblockParcelMutation();
 
     const handleStatusUpdate = (updatedParcelData: Parcel) => {
         console.log("Parcel status updated:", updatedParcelData);
         setIsDialogOpen(false);
-    
+
     };
 
     // --- New handler functions for block/unblock ---
@@ -176,6 +189,14 @@ const ManageAllParcels = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+
+                            <DropdownMenuItem onClick={() => {
+                                setSelectedParcelId(parcel._id);
+                                setIsDetailsDialogOpen(true);
+                            }}>
+                                View Details
+                            </DropdownMenuItem>
                             {/* The DialogTrigger now sets the state */}
                             <DropdownMenuItem onSelect={(e) => {
                                 e.preventDefault(); // Prevent the dropdown from closing
@@ -229,6 +250,7 @@ const ManageAllParcels = () => {
         return <div className="p-4 text-center text-red-500">Error loading parcels. Please try again later.</div>;
     }
 
+    const singleParcel = singleParcelData?.data;
     return (
         <Card className="p-4">
             <CardHeader>
@@ -343,6 +365,41 @@ const ManageAllParcels = () => {
                             parcel={selectedParcel}
                             onStatusUpdated={handleStatusUpdate}
                         />
+                    )}
+                </DialogContent>
+            </Dialog>
+
+
+            <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Parcel Details</DialogTitle>
+                        <DialogDescription>
+                            All details for the selected parcel.
+                        </DialogDescription>
+                    </DialogHeader>
+                    {singleParcelLoading ? (
+                        <div>Loading...</div>
+                    ) : singleParcel ? (
+                        <div className="space-y-4">
+                            <p><strong>Tracking ID:</strong> {singleParcel.trackingId}</p>
+                            <p><strong>Status:</strong> <Badge variant={getStatusBadgeVariant(singleParcel.currentStatus)}>{singleParcel.currentStatus}</Badge></p>
+                            <p><strong>Parcel Type:</strong> {singleParcel.parcelType}</p>
+                            <p><strong>Weight:</strong> {singleParcel.weight} kg</p>
+                            <p><strong>Delivery Address:</strong> {singleParcel.deliveryAddress}</p>
+                            <DropdownMenuSeparator />
+                            <h4 className="font-semibold">Sender Details</h4>
+                            <p><strong>Name:</strong> {singleParcel.sender.name}</p>
+                            <p><strong>Email:</strong> {singleParcel.sender.email}</p>
+                            <DropdownMenuSeparator />
+                            <h4 className="font-semibold">Receiver Details</h4>
+                            <p><strong>Name:</strong> {singleParcel.receiver.name}</p>
+                            <p><strong>Email:</strong> {singleParcel.receiver.email}</p>
+                            <p><strong>Phone:</strong> {singleParcel.receiver.phone}</p>
+                            <p><strong>Address:</strong> {singleParcel.receiver.address}</p>
+                        </div>
+                    ) : (
+                        <div>Parcel details could not be loaded.</div>
                     )}
                 </DialogContent>
             </Dialog>

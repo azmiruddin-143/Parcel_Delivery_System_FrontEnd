@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {   useConfirmParcelMutation, useGetIncomingParcelsQuery } from "@/redux/features/auth/auth.api";
+import { useConfirmParcelMutation, useGetIncomingParcelsQuery, useGetSingleParcelQuery } from "@/redux/features/auth/auth.api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     DropdownMenu,
@@ -38,7 +38,7 @@ import { MoreHorizontal, ChevronDown, Edit, Trash } from "lucide-react";
 
 import { Parcel } from "@/type";
 import toast from "react-hot-toast";
-
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 // This type definition must be consistent across all files
 // type Parcel = { ... }
 
@@ -65,9 +65,22 @@ const getStatusBadgeVariant = (status: string) => {
 const ViewIncomingParcels = () => {
     // Hooks must be called inside the component
     const { data: allParcels, isLoading, isError } = useGetIncomingParcelsQuery(undefined);
-        const [cancelParcel] = useConfirmParcelMutation();
+    const [cancelParcel] = useConfirmParcelMutation();
     const [globalFilter, setGlobalFilter] = React.useState("");
-      // --- New handler functions ---
+
+
+
+    const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
+    const [selectedParcelId, setSelectedParcelId] = React.useState<string | null>(null);
+
+    const { data: singleParcelData, isLoading: singleParcelLoading } = useGetSingleParcelQuery(selectedParcelId, {
+        skip: !selectedParcelId,
+    });
+
+
+
+
+    // --- New handler functions ---
     const handleCancel = async (parcelId: string) => {
         try {
             await cancelParcel(parcelId).unwrap();
@@ -164,9 +177,16 @@ const ViewIncomingParcels = () => {
                                 <MoreHorizontal className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            
+
+                            <DropdownMenuItem onClick={() => {
+                                setSelectedParcelId(parcel._id);
+                                setIsDetailsDialogOpen(true);
+                            }}>
+                                View Details
+                            </DropdownMenuItem>
+
                             {/* Only show 'Cancel Parcel' for 'Requested' or 'Approved' status */}
                             {/* {(parcel.currentStatus === 'Requested' || parcel.currentStatus === 'Approved') && (
                                 <DropdownMenuItem onClick={() => handleCancel(parcel._id)}>
@@ -174,12 +194,12 @@ const ViewIncomingParcels = () => {
                                 </DropdownMenuItem>
                             )} */}
 
-                             <DropdownMenuItem onClick={() => handleCancel(parcel._id)}>
-                                    Confirm Parcel
-                                </DropdownMenuItem>
-                            
+                            <DropdownMenuItem onClick={() => handleCancel(parcel._id)}>
+                                Confirm Parcel
+                            </DropdownMenuItem>
+
                             <DropdownMenuSeparator />
-                            
+
                             {/* Other action buttons */}
                             <DropdownMenuItem onClick={() => handleEdit(parcel._id)}>
                                 <Edit className="mr-2 h-4 w-4" /> Edit
@@ -218,6 +238,8 @@ const ViewIncomingParcels = () => {
     if (isError) {
         return <div className="p-4 text-center text-red-500">Error loading parcels. Please try again later.</div>;
     }
+
+    const singleParcel = singleParcelData?.data;
 
     return (
         <Card className="p-4">
@@ -319,8 +341,40 @@ const ViewIncomingParcels = () => {
                     </Button>
                 </div>
             </CardContent>
-            {/* The Dialog is now a top-level element, rendering conditionally */}
-            
+            <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Parcel Details</DialogTitle>
+                        <DialogDescription>
+                            All details for the selected parcel.
+                        </DialogDescription>
+                    </DialogHeader>
+                    {singleParcelLoading ? (
+                        <div>Loading...</div>
+                    ) : singleParcel ? (
+                        <div className="space-y-4">
+                            <p><strong>Tracking ID:</strong> {singleParcel.trackingId}</p>
+                            <p><strong>Status:</strong> <Badge variant={getStatusBadgeVariant(singleParcel.currentStatus)}>{singleParcel.currentStatus}</Badge></p>
+                            <p><strong>Parcel Type:</strong> {singleParcel.parcelType}</p>
+                            <p><strong>Weight:</strong> {singleParcel.weight} kg</p>
+                            <p><strong>Delivery Address:</strong> {singleParcel.deliveryAddress}</p>
+                            <DropdownMenuSeparator />
+                            <h4 className="font-semibold">Sender Details</h4>
+                            <p><strong>Name:</strong> {singleParcel.sender.name}</p>
+                            <p><strong>Email:</strong> {singleParcel.sender.email}</p>
+                            <DropdownMenuSeparator />
+                            <h4 className="font-semibold">Receiver Details</h4>
+                            <p><strong>Name:</strong> {singleParcel.receiver.name}</p>
+                            <p><strong>Email:</strong> {singleParcel.receiver.email}</p>
+                            <p><strong>Phone:</strong> {singleParcel.receiver.phone}</p>
+                            <p><strong>Address:</strong> {singleParcel.receiver.address}</p>
+                        </div>
+                    ) : (
+                        <div>Parcel details could not be loaded.</div>
+                    )}
+                </DialogContent>
+            </Dialog>
+
         </Card>
     );
 };

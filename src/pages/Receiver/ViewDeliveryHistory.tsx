@@ -1,4 +1,3 @@
-"use client";
 
 import * as React from "react";
 import {
@@ -20,7 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useGetDeliveredParcelsQuery, useUserInfoQuery } from "@/redux/features/auth/auth.api";
+import { useGetDeliveredParcelsQuery, useGetSingleParcelQuery, useUserInfoQuery } from "@/redux/features/auth/auth.api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     DropdownMenu,
@@ -29,14 +28,37 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuCheckboxItem,
+    DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, ChevronDown } from "lucide-react";
 import { Parcel } from "@/type";
 import { toast } from "sonner";
 import { format } from 'date-fns';
-
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 // Define the columns for your table
-const columns: ColumnDef<Parcel>[] = [
+
+
+const ViewDeliveryHistory = () => {
+    const { data: userInfo, isLoading: userLoading, isError: userError } = useUserInfoQuery(undefined);
+    const receiverId = userInfo?.data?._id;
+
+    const { data: deliveredParcels, isLoading: parcelsLoading, isError: parcelsError } = useGetDeliveredParcelsQuery(receiverId, {
+        skip: !receiverId,
+    });
+
+    const [globalFilter, setGlobalFilter] = React.useState("");
+
+    const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
+    const [selectedParcelId, setSelectedParcelId] = React.useState<string | null>(null);
+
+    const { data: singleParcelData, isLoading: singleParcelLoading } = useGetSingleParcelQuery(selectedParcelId, {
+        skip: !selectedParcelId,
+    });
+
+
+
+    const tableData = React.useMemo(() => deliveredParcels?.data || [], [deliveredParcels]);
+    const columns: ColumnDef<Parcel>[] = [
     {
         accessorKey: "trackingId",
         header: "Tracking ID",
@@ -108,7 +130,10 @@ const columns: ColumnDef<Parcel>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => toast.info(`Viewing details for ${parcel.trackingId}`)}>
+                        <DropdownMenuItem onClick={() => {
+                            setSelectedParcelId(parcel._id);
+                            setIsDetailsDialogOpen(true);
+                        }}>
                             View Details
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => toast.info(`Downloading invoice for ${parcel.trackingId}`)}>
@@ -121,18 +146,6 @@ const columns: ColumnDef<Parcel>[] = [
     },
 ];
 
-const ViewDeliveryHistory = () => {
-    const { data: userInfo, isLoading: userLoading, isError: userError } = useUserInfoQuery(undefined);
-    const receiverId = userInfo?.data?._id;
-
-    const { data: deliveredParcels, isLoading: parcelsLoading, isError: parcelsError } = useGetDeliveredParcelsQuery(receiverId, {
-        skip: !receiverId,
-    });
-    
-    const [globalFilter, setGlobalFilter] = React.useState("");
-
-    const tableData = React.useMemo(() => deliveredParcels?.data || [], [deliveredParcels]);
-    
     const table = useReactTable({
         data: tableData,
         columns,
@@ -158,6 +171,8 @@ const ViewDeliveryHistory = () => {
         return <div className="p-4 text-center text-red-500">Error loading delivery history. Please try again.</div>;
     }
 
+
+    const singleParcel = singleParcelData?.data;
     return (
         <Card className="p-4">
             <CardHeader>
@@ -208,9 +223,9 @@ const ViewDeliveryHistory = () => {
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                      header.column.columnDef.header,
-                                                      header.getContext()
-                                                  )}
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
                                         </TableHead>
                                     ))}
                                 </TableRow>
@@ -259,8 +274,45 @@ const ViewDeliveryHistory = () => {
                     </Button>
                 </div>
             </CardContent>
+
+            <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Parcel Details</DialogTitle>
+                        <DialogDescription>
+                            All details for the selected parcel.
+                        </DialogDescription>
+                    </DialogHeader>
+                    {singleParcelLoading ? (
+                        <div>Loading...</div>
+                    ) : singleParcel ? (
+                        <div className="space-y-4">
+                            <p><strong>Tracking ID:</strong> {singleParcel.trackingId}</p>
+                            <p><strong>Status:</strong> <Badge variant={(singleParcel.currentStatus)}>{singleParcel.currentStatus}</Badge></p>
+                            <p><strong>Parcel Type:</strong> {singleParcel.parcelType}</p>
+                            <p><strong>Weight:</strong> {singleParcel.weight} kg</p>
+                            <p><strong>Delivery Address:</strong> {singleParcel.deliveryAddress}</p>
+                            <DropdownMenuSeparator/>
+                            <h4 className="font-semibold">Sender Details</h4>
+                            <p><strong>Name:</strong> {singleParcel.sender.name}</p>
+                            <p><strong>Email:</strong> {singleParcel.sender.email}</p>
+                            <DropdownMenuSeparator />
+                            <h4 className="font-semibold">Receiver Details</h4>
+                            <p><strong>Name:</strong> {singleParcel.receiver.name}</p>
+                            <p><strong>Email:</strong> {singleParcel.receiver.email}</p>
+                            <p><strong>Phone:</strong> {singleParcel.receiver.phone}</p>
+                            <p><strong>Address:</strong> {singleParcel.receiver.address}</p>
+                        </div>
+                    ) : (
+                        <div>Parcel details could not be loaded.</div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </Card>
     );
 };
 
 export default ViewDeliveryHistory;
+
+
+

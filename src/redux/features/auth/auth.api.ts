@@ -172,7 +172,7 @@ export const authApi = baseApi.injectEndpoints({
     }),
 
     getDeliveredParcels: builder.query({
-      query: (receiverId) => ({ 
+      query: () => ({
         url: "/parcels/delivered",
         method: "GET",
       }),
@@ -180,6 +180,14 @@ export const authApi = baseApi.injectEndpoints({
     }),
 
 
+
+    getSingleParcel: builder.query({
+      query: (parcelId) => ({
+        url: `/parcels/${parcelId}`,
+        method: "GET",
+      }),
+      providesTags: ["Parcel"],
+    }),
 
     confirmParcel: builder.mutation({
       query: (parcelId) => ({
@@ -190,10 +198,6 @@ export const authApi = baseApi.injectEndpoints({
     }),
 
   }),
-
-
-
-
 
 
 
@@ -229,7 +233,9 @@ export const {
   useGetIncomingParcelsQuery,
   useConfirmParcelMutation,
   useSearchUserByEmailQuery,
- useGetDeliveredParcelsQuery
+  useGetDeliveredParcelsQuery,
+  useGetSingleParcelQuery
+
 
 
 } = authApi;
