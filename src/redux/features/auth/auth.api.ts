@@ -171,6 +171,15 @@ export const authApi = baseApi.injectEndpoints({
       providesTags: ["User"],
     }),
 
+    getDeliveredParcels: builder.query({
+      query: (receiverId) => ({ 
+        url: "/parcels/delivered",
+        method: "GET",
+      }),
+      providesTags: ["Parcel"],
+    }),
+
+
 
     confirmParcel: builder.mutation({
       query: (parcelId) => ({
@@ -219,7 +228,8 @@ export const {
   // Reciver
   useGetIncomingParcelsQuery,
   useConfirmParcelMutation,
-  useSearchUserByEmailQuery
+  useSearchUserByEmailQuery,
+ useGetDeliveredParcelsQuery
 
 
 } = authApi;
