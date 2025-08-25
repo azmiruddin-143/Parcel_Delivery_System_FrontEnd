@@ -175,7 +175,7 @@ const ViewIncomingParcels = () => {
                             )} */}
 
                              <DropdownMenuItem onClick={() => handleCancel(parcel._id)}>
-                                    Cancel Parcel
+                                    Confirm Parcel
                                 </DropdownMenuItem>
                             
                             <DropdownMenuSeparator />

@@ -219,11 +219,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useParcelMutation, useSearchUserByEmailQuery } from '@/redux/features/auth/auth.api';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 // Updated Schema for form validation
 const parcelSchema = z.object({
@@ -254,7 +254,7 @@ const ParcelCreate = () => {
             deliveryAddress: "",
         },
     });
-    
+
     const [receiverEmail, setReceiverEmail] = useState('');
     const { data: userData, isFetching } = useSearchUserByEmailQuery(receiverEmail, {
         skip: !receiverEmail,
@@ -263,16 +263,16 @@ const ParcelCreate = () => {
     useEffect(() => {
         if (userData?.data?._id) {
             form.setValue('receiverName', userData.data.name);
-            toast.success(`User found: ${userData.data.name}`);
+            // toast.success(`User found: ${userData.data.name}`);
         } else if (receiverEmail && !isFetching) {
             form.resetField('receiverName');
-            toast.warning(`No user found with this email.`);
+            toast.error(`No user found with this email.`);
         }
     }, [userData, receiverEmail, isFetching, form]);
 
     const onSubmit = async (data: ParcelFormData) => {
         const receiverUserId = userData?.data?._id;
-        
+
         if (!receiverUserId) {
             toast.error("Please enter a valid receiver email to find their ID.");
             return;
@@ -290,15 +290,28 @@ const ParcelCreate = () => {
             weight: data.weight,
             deliveryAddress: data.deliveryAddress,
         };
-        
-        try {
-            await parcels(parcelData).unwrap();
-            toast.success("Parcel created successfully");
-            navigate("/");
-        } catch (error) {
-            const errorMessage = error?.data?.message || "Failed to create parcel. Please try again.";
-            toast.error(errorMessage);
+
+       
+         try {
+        await parcels(parcelData).unwrap();
+        toast.success("Parcel created successfully");
+        navigate("/");
+    } catch (error) {
+        console.error(error); // এটি পুরো ত্রুটি অবজেক্টটি কনসোলে দেখাবে
+
+        // ত্রুটির মেসেজটি নিরাপদে বের করে আনা
+        let errorMessage = "Failed to create parcel. Please try again.";
+
+        // error অবজেক্টের গঠন পরীক্ষা করা
+        if (error.data && typeof error.data.message === 'string') {
+            errorMessage = error.data.message;
         }
+
+        // এবার toast-এ সঠিক ত্রুটি বার্তাটি দেখানো হবে
+        toast.error(errorMessage);
+    }
+
+
     };
 
     return (
@@ -319,10 +332,10 @@ const ParcelCreate = () => {
                                         <FormItem>
                                             <FormLabel>Receiver's Email</FormLabel>
                                             <FormControl>
-                                                <Input 
-                                                    placeholder="Enter receiver's email" 
-                                                    type="email" 
-                                                    {...field} 
+                                                <Input
+                                                    placeholder="Enter receiver's email"
+                                                    type="email"
+                                                    {...field}
                                                     onBlur={(e) => {
                                                         field.onBlur();
                                                         setReceiverEmail(e.target.value);
@@ -340,9 +353,9 @@ const ParcelCreate = () => {
                                         <FormItem>
                                             <FormLabel>Receiver's Name</FormLabel>
                                             <FormControl>
-                                                <Input 
-                                                    placeholder="Enter receiver's name" 
-                                                    {...field} 
+                                                <Input
+                                                    placeholder="Enter receiver's name"
+                                                    {...field}
                                                     disabled={!!userData?.data?._id}
                                                 />
                                             </FormControl>
