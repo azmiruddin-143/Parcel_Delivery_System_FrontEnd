@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {  useCancelParcelMutation, useGetMyParcelsQuery, useGetSingleParcelQuery, } from "@/redux/features/auth/auth.api";
+import { useCancelParcelMutation, useDeleteParcelMutation, useGetMyParcelsQuery, useGetSingleParcelQuery, } from "@/redux/features/auth/auth.api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     DropdownMenu,
@@ -36,7 +36,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, ChevronDown, Edit, Trash } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Parcel } from "@/type";
 import toast from "react-hot-toast";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
@@ -67,7 +76,7 @@ const getStatusBadgeVariant = (status: string) => {
 const ViewAllCreatedParcels = () => {
     // Hooks must be called inside the component
 
-const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
+    const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
     const [selectedParcelId, setSelectedParcelId] = React.useState<string | null>(null);
 
     const { data: singleParcelData, isLoading: singleParcelLoading } = useGetSingleParcelQuery(selectedParcelId, {
@@ -75,11 +84,35 @@ const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
     });
 
 
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+    const [parcelToDeleteId, setParcelToDeleteId] = React.useState<string | null>(null);
+     const [deleteParcel, { isLoading: isDeleting }] = useDeleteParcelMutation();
+   
+
+
+
+    const handleDelete = async () => {
+        if (!parcelToDeleteId) return;
+
+        try {
+            await deleteParcel(parcelToDeleteId).unwrap();
+            toast.success("Parcel deleted successfully! 🗑️");
+        } catch (error) {
+            const errorMessage = error?.data?.message || "Failed to delete parcel.";
+            toast.error(errorMessage);
+        } finally {
+            setIsDeleteDialogOpen(false);
+            setParcelToDeleteId(null);
+        }
+    };
+
+
+
 
     const { data: allParcels, isLoading, isError } = useGetMyParcelsQuery(undefined);
-        const [cancelParcel] = useCancelParcelMutation();
+    const [cancelParcel] = useCancelParcelMutation();
     const [globalFilter, setGlobalFilter] = React.useState("");
-      // --- New handler functions ---
+    // --- New handler functions ---
     const handleCancel = async (parcelId: string) => {
         try {
             await cancelParcel(parcelId).unwrap();
@@ -90,13 +123,13 @@ const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
         }
     };
 
+
+
+
     const handleEdit = (parcelId: string) => {
         alert(`Edit parcel with ID: ${parcelId}`);
     };
 
-    const handleDelete = (parcelId: string) => {
-        alert(`Delete parcel with ID: ${parcelId}`);
-    };
 
 
 
@@ -164,49 +197,79 @@ const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
                 </Badge>
             ),
         },
-        {
-            id: "actions",
-            cell: ({ row }) => {
-                const parcel = row.original;
-                return (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const parcel = row.original;
+        const isRequested = parcel.currentStatus === "Requested" || parcel.currentStatus === "Cancelled";
 
-                            <DropdownMenuItem onClick={() => {
-                                setSelectedParcelId(parcel._id);
-                                setIsDetailsDialogOpen(true);
-                            }}>
-                                View Details
-                            </DropdownMenuItem>
-                            
-                            {/* Only show 'Cancel Parcel' for 'Requested' or 'Approved' status */}
-                            {(parcel.currentStatus === 'Requested' || parcel.currentStatus === 'Approved') && (
-                                <DropdownMenuItem onClick={() => handleCancel(parcel._id)}>
-                                    Cancel Parcel
-                                </DropdownMenuItem>
-                            )}
-                            
-                            <DropdownMenuSeparator />
-                            
-                            {/* Other action buttons */}
-                            <DropdownMenuItem onClick={() => handleEdit(parcel._id)}>
-                                <Edit className="mr-2 h-4 w-4" /> Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDelete(parcel._id)}>
-                                <Trash className="mr-2 h-4 w-4" /> Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                );
-            },
-        },
+        return (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+                <DropdownMenuItem onClick={() => {
+                  setSelectedParcelId(parcel._id);
+                  setIsDetailsDialogOpen(true);
+                }}>
+                  View Details
+                </DropdownMenuItem>
+
+                {(parcel.currentStatus === 'Requested' || parcel.currentStatus === 'Approved') && (
+                  <DropdownMenuItem onClick={() => handleCancel(parcel._id)}>
+                    Cancel Parcel
+                  </DropdownMenuItem>
+                )}
+                
+                <DropdownMenuSeparator />
+                
+                <DropdownMenuItem onClick={() => handleEdit(parcel._id)}>
+                  <Edit className="mr-2 h-4 w-4" /> Edit
+                </DropdownMenuItem>
+
+                {isRequested && (
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.preventDefault(); 
+                      setIsDeleteDialogOpen(true); 
+                      setParcelToDeleteId(parcel._id);
+                    }}
+                  >
+                    <Trash className="mr-2 h-4 w-4" /> Delete
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* AlertDialog বাইরে রেন্ডার করা হয়েছে */}
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete this parcel.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
+                    {isDeleting ? "Deleting..." : "Continue"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
+        );
+      },
+    },
     ];
 
     const table = useReactTable({
@@ -227,7 +290,7 @@ const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
     });
 
     if (isLoading) {
-          return <LoadingSkeleton></LoadingSkeleton>
+        return <LoadingSkeleton></LoadingSkeleton>
     }
 
     if (isError) {
@@ -239,7 +302,7 @@ const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
         <Card className="p-4">
             <CardHeader>
                 <CardTitle>All Parcels</CardTitle>
-                
+
                 <CardDescription>Manage all incoming and outgoing parcels.</CardDescription>
                 <div className="flex items-center py-4 justify-between">
                     <Input
@@ -369,7 +432,7 @@ const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
                     )}
                 </DialogContent>
             </Dialog>
-            
+
         </Card>
     );
 };

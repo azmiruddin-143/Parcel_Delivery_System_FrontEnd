@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useAllparcelsQuery, useBlockParcelMutation, useGetSingleParcelQuery, useUnblockParcelMutation } from "@/redux/features/auth/auth.api";
+import { useAllparcelsQuery, useBlockParcelMutation,  useDeleteParcelMutation,  useGetSingleParcelQuery, useUnblockParcelMutation } from "@/redux/features/auth/auth.api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     DropdownMenu,
@@ -46,7 +46,17 @@ import { StatusUpdateForm } from "./StatusUpdateForm";
 import { Parcel } from "@/type";
 import toast from "react-hot-toast";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
-
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Trash } from "lucide-react";
 // This type definition must be consistent across all files
 // type Parcel = { ... }
 
@@ -79,6 +89,14 @@ const ManageAllParcels = () => {
 
     const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
     const [selectedParcelId, setSelectedParcelId] = React.useState<string | null>(null);
+
+
+    // --- নতুন স্টেট ও মিউটেশন হুক ---
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+    const [parcelToDeleteId, setParcelToDeleteId] = React.useState<string | null>(null);
+    const [deleteParcelMutation, { isLoading: isDeleting }] = useDeleteParcelMutation();
+
+
 
     const { data: singleParcelData, isLoading: singleParcelLoading } = useGetSingleParcelQuery(selectedParcelId, {
         skip: !selectedParcelId,
@@ -113,6 +131,21 @@ const ManageAllParcels = () => {
         }
     };
 
+
+      const handleDelete = async () => {
+    if (!parcelToDeleteId) return;
+
+    try {
+        await deleteParcelMutation(parcelToDeleteId).unwrap();
+        toast.success("Parcel deleted successfully! 🗑️");
+    } catch (error) {
+        const errorMessage = error?.data?.message || "Failed to delete parcel.";
+        toast.error(errorMessage);
+    } finally {
+        setIsDeleteDialogOpen(false);
+        setParcelToDeleteId(null);
+    }
+};
 
     const tableData = React.useMemo(() => allParcels?.data?.data || [], [allParcels]);
 
@@ -176,54 +209,137 @@ const ManageAllParcels = () => {
                 </Badge>
             ),
         },
+        // {
+        //     id: "actions",
+        //     cell: ({ row }) => {
+        //         const parcel = row.original;
+        //         return (
+        //             <DropdownMenu>
+        //                 <DropdownMenuTrigger asChild>
+        //                     <Button variant="ghost" className="h-8 w-8 p-0">
+        //                         <span className="sr-only">Open menu</span>
+        //                         <MoreHorizontal className="h-4 w-4" />
+        //                     </Button>
+        //                 </DropdownMenuTrigger>
+        //                 <DropdownMenuContent align="end">
+        //                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+
+        //                     <DropdownMenuItem onClick={() => {
+        //                         setSelectedParcelId(parcel._id);
+        //                         setIsDetailsDialogOpen(true);
+        //                     }}>
+        //                         View Details
+        //                     </DropdownMenuItem>
+                  
+        //                     <DropdownMenuItem onSelect={(e) => {
+        //                         e.preventDefault(); 
+        //                         setSelectedParcel(parcel);
+        //                         setIsDialogOpen(true);
+        //                     }}>
+        //                         Update Status
+        //                     </DropdownMenuItem>
+        //                     <DropdownMenuSeparator />
+
+        //                     <DropdownMenuItem
+        //                         onClick={() => handleBlockUnblock(parcel._id, 'block')}
+        //                         disabled={parcel.isBlocked}
+        //                     >
+        //                         Block Parcel
+        //                     </DropdownMenuItem>
+        //                     <DropdownMenuItem
+        //                         onClick={() => handleBlockUnblock(parcel._id, 'unblock')}
+        //                         disabled={!parcel.isBlocked}
+        //                     >
+        //                         Unblock Parcel
+        //                     </DropdownMenuItem>
+        //                 </DropdownMenuContent>
+        //             </DropdownMenu>
+        //         );
+        //     },
+        // },
+
         {
-            id: "actions",
-            cell: ({ row }) => {
-                const parcel = row.original;
-                return (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-
-                            <DropdownMenuItem onClick={() => {
-                                setSelectedParcelId(parcel._id);
-                                setIsDetailsDialogOpen(true);
-                            }}>
-                                View Details
-                            </DropdownMenuItem>
-                            {/* The DialogTrigger now sets the state */}
-                            <DropdownMenuItem onSelect={(e) => {
-                                e.preventDefault(); // Prevent the dropdown from closing
-                                setSelectedParcel(parcel);
-                                setIsDialogOpen(true);
-                            }}>
-                                Update Status
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
+    id: "actions",
+    cell: ({ row }) => {
+        const parcel = row.original;
+        const isRequested = parcel.currentStatus === "Requested" || parcel.currentStatus === "Cancelled";
+        return (
+            <>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => {
+                            setSelectedParcelId(parcel._id);
+                            setIsDetailsDialogOpen(true);
+                        }}>
+                            View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={(e) => {
+                            e.preventDefault();
+                            setSelectedParcel(parcel);
+                            setIsDialogOpen(true);
+                        }}>
+                            Update Status
+                        </DropdownMenuItem>
+                        
+                        {/* --- ডিলিট আইটেমটি এখানে যোগ করা হয়েছে --- */}
+                        {isRequested && (
                             <DropdownMenuItem
-                                onClick={() => handleBlockUnblock(parcel._id, 'block')}
-                                disabled={parcel.isBlocked}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setIsDeleteDialogOpen(true);
+                                    setParcelToDeleteId(parcel._id);
+                                }}
                             >
-                                Block Parcel
+                                <Trash className="mr-2 h-4 w-4" /> Delete
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => handleBlockUnblock(parcel._id, 'unblock')}
-                                disabled={!parcel.isBlocked}
-                            >
-                                Unblock Parcel
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                );
-            },
-        },
+                        )}
+                        
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            onClick={() => handleBlockUnblock(parcel._id, 'block')}
+                            disabled={parcel.isBlocked}
+                        >
+                            Block Parcel
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => handleBlockUnblock(parcel._id, 'unblock')}
+                            disabled={!parcel.isBlocked}
+                        >
+                            Unblock Parcel
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* --- AlertDialog বাইরে রেন্ডার করা হয়েছে --- */}
+                <AlertDialog  open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                    <AlertDialogContent>
+                        
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete this parcel.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
+                                {isDeleting ? "Deleting..." : "Continue"}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            </>
+        );
+    },
+},
     ];
 
     const table = useReactTable({

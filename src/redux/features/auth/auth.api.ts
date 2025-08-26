@@ -153,6 +153,13 @@ export const authApi = baseApi.injectEndpoints({
       invalidatesTags: ["Parcel"],
     }),
 
+    deleteParcel: builder.mutation({
+      query: (parcelId: string) => ({
+        url: `/parcels/${parcelId}`,
+        method: 'DELETE', 
+      }),
+      invalidatesTags: ['Parcel'], 
+    }),
 
     //  Recever//
     getIncomingParcels: builder.query({
@@ -228,6 +235,7 @@ export const {
   // Sender User
   useGetMyParcelsQuery,
   useCancelParcelMutation,
+  useDeleteParcelMutation,
 
   // Reciver
   useGetIncomingParcelsQuery,
