@@ -34,11 +34,14 @@ export function LoginForm({
         toast.success("User Login SuccesFull");
         navigate("/",);
       }
-    } catch (err) {
+    } 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    catch (err: any) {
       console.error(err);
-
-      if (err.status === 500) {
-        toast.error(err?.data.message);
+      if (err?.data?.message) {
+        toast.error(err.data.message);
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
       }
     }
   };

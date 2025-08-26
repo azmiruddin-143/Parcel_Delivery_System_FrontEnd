@@ -65,7 +65,7 @@ export const ParcelEditForm: React.FC<ParcelEditFormProps> = ({ parcel, onEditSu
         },
     });
 
-    // Default ভ্যালু সেট করা
+  
     useEffect(() => {
         form.reset({
             receiverName: parcel.receiver.name || "",
@@ -79,7 +79,7 @@ export const ParcelEditForm: React.FC<ParcelEditFormProps> = ({ parcel, onEditSu
         setReceiverEmail(parcel.receiver.email);
     }, [parcel, form]);
 
-    // রিসিভারের ইমেল পরিবর্তন হলে নাম আপডেট করা
+
     useEffect(() => {
         if (userData?.data) {
             form.setValue('receiverName', userData.data.name);
@@ -94,7 +94,7 @@ export const ParcelEditForm: React.FC<ParcelEditFormProps> = ({ parcel, onEditSu
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const payload: any = {};
         
-        // শুধুমাত্র যে ফিল্ডগুলো পরিবর্তন হয়েছে সেগুলো payload এ যোগ করা
+
         if (data.parcelType !== parcel.parcelType) payload.parcelType = data.parcelType;
         if (data.weight !== parcel.weight) payload.weight = data.weight;
         if (data.deliveryAddress !== parcel.deliveryAddress) payload.deliveryAddress = data.deliveryAddress;
@@ -105,7 +105,6 @@ export const ParcelEditForm: React.FC<ParcelEditFormProps> = ({ parcel, onEditSu
         if (data.receiverPhone !== parcel.receiver.phone) receiverPayload.phone = data.receiverPhone;
         if (data.receiverAddress !== parcel.receiver.address) receiverPayload.address = data.receiverAddress;
         if (data.receiverEmail !== parcel.receiver.email) {
-            // ইমেইল আপডেট হলে পুরো রিসিভার অবজেক্ট পাঠাতে হবে
             receiverPayload.email = data.receiverEmail;
         }
 

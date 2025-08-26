@@ -1,6 +1,7 @@
 
 import ManageAllParcels from "@/pages/Admin/ManageAllParcels";
 import ManageAllUsers from "@/pages/Admin/ManageAllUsers";
+import ProfilePage from "@/pages/MyProfile/ProfilePage";
 import { ISidebarItem } from "@/type";
 import { lazy } from "react";
 
@@ -10,6 +11,11 @@ export const adminSidebarItems : ISidebarItem[] = [
     {
       title: "Dashboard",
       items: [
+        {
+          title: "My Profile",
+          url: "/admin/myprofile",
+          component:ProfilePage,
+        },
         {
           title: "Analytics",
           url: "/admin/analytics",

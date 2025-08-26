@@ -16,7 +16,6 @@ import { Link, useNavigate, } from "react-router";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRegisterMutation } from "@/redux/features/auth/auth.api";
-// import { toast } from "sonner";
 import Password from "@/components/ui/Password";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import toast from "react-hot-toast";
@@ -34,7 +33,7 @@ const registerSchema = z
     confirmPassword: z
       .string()
       .min(8, { error: "Confirm Password is too short" }),
-      // Add the new role validation using z.enum
+    // Add the new role validation using z.enum
     role: z.enum(["Sender", "Receiver"], {
       message: "You need to select a role.",
     }),
@@ -74,10 +73,27 @@ export function RegisterForm({
       const result = await register(userInfo).unwrap();
       console.log(result);
       toast.success("User created successfully");
-      navigate("/");
-    } catch (error) {
-      console.error(error);
+      navigate("/login");
+
     }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+catch (error: any) {
+      console.error(error);
+      
+      let errorMessage = "An unexpected error occurred. Please try again.";
+
+      if (error?.data?.message && typeof error.data.message === 'string' && error.data.errorSources.length === 0) {
+        errorMessage = error.data.message;
+      } 
+
+      else if (error?.data?.errorSources && Array.isArray(error.data.errorSources) && error.data.errorSources.length > 0) {
+        errorMessage = error.data.errorSources[0].message;
+      }
+      
+      toast.error(errorMessage);
+    }
+
+
   };
 
   return (

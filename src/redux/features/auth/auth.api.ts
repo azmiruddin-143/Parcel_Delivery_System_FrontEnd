@@ -213,10 +213,28 @@ export const authApi = baseApi.injectEndpoints({
       invalidatesTags: ["Parcel"],
     }),
 
+
+
+    updateUserProfile: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/users/${id}`,
+        method: "PATCH",
+        body: body, 
+      }),
+      invalidatesTags: ["User"],
+    }),
+
+    
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: "/auth/reset-password",
+        method: "POST",
+        data: data,
+      }),
+
+    }),
+
   }),
-
-
-
 
 });
 
@@ -252,8 +270,13 @@ export const {
   useConfirmParcelMutation,
   useSearchUserByEmailQuery,
   useGetDeliveredParcelsQuery,
-  useGetSingleParcelQuery
+  useGetSingleParcelQuery,
 
+
+  // My Profile Data 
+
+  useUpdateUserProfileMutation,
+  useChangePasswordMutation
 
 
 } = authApi;
