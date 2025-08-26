@@ -4,46 +4,58 @@ import About from "@/pages/About";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import { generateRoutes } from "@/utils/generateRoutes";
-// import { createBrowserRouter, } from "react-router";
 import { adminSidebarItems } from "./adminSidebarItems";
 import { senderSidebarItems } from "./senderSidebarItem";
 import { receiverSidebarItems } from "./receiverSideItem";
-import { createBrowserRouter} from "react-router";
+import { createBrowserRouter, Navigate} from "react-router";
 import Unauthorized from "@/pages/Unauthorized";
 import { withAuth } from "@/utils/withAuth";
 import { role } from "@/constants/role";
 import { TRole } from "@/type";
+import ErrorPage from "../pages/ErrorPage"; 
 export const router = createBrowserRouter([
-    {
+    
+     {
         Component: App,
         path: "/",
+        errorElement: <ErrorPage />,
         children: [
             {
-                Component: withAuth(About),
                 path: "about",
+                Component: withAuth(About),
             },
         ],
     },
+
     {
         Component: withAuth(DashboardLayout, role.Admin as TRole),
         path: "/admin",
         children: [
-    //         {
-    //     index: true, 
-    //     element: <Navigate to="/admin/analytics" replace />,
-    //   },
+        { index: true, element: <Navigate to="/admin/analytics" /> },
         ...generateRoutes(adminSidebarItems)],
 
     },
     {
         Component: withAuth(DashboardLayout, role.Sender as TRole),
         path: "/sender",
-        children: [...generateRoutes(senderSidebarItems)]
+        children:
+        
+         [
+            { index: true, element: <Navigate to="/sender/parcelcreate" /> },
+            ...generateRoutes(senderSidebarItems)
+
+         ]
     },
     {
         Component: withAuth(DashboardLayout, role.Receiver as TRole),
         path: "/receiver",
-        children: [...generateRoutes(receiverSidebarItems)]
+        children: [
+            
+            ...generateRoutes(receiverSidebarItems),
+
+            { index: true, element: <Navigate to="/receiver/viewincomingparcels" /> },
+        
+        ]
     },
 
     {
@@ -60,3 +72,4 @@ export const router = createBrowserRouter([
     }
 
 ]);
+

@@ -35,6 +35,7 @@ import { Parcel } from "@/type";
 import { toast } from "sonner";
 import { format } from 'date-fns';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 // Define the columns for your table
 
 
@@ -164,7 +165,7 @@ const ViewDeliveryHistory = () => {
     });
 
     if (userLoading || parcelsLoading) {
-        return <div className="p-4 text-center">Loading delivery history...</div>;
+          return <LoadingSkeleton></LoadingSkeleton>
     }
 
     if (userError || parcelsError) {
@@ -284,7 +285,7 @@ const ViewDeliveryHistory = () => {
                         </DialogDescription>
                     </DialogHeader>
                     {singleParcelLoading ? (
-                        <div>Loading...</div>
+                         <LoadingSkeleton></LoadingSkeleton>
                     ) : singleParcel ? (
                         <div className="space-y-4">
                             <p><strong>Tracking ID:</strong> {singleParcel.trackingId}</p>

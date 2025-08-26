@@ -25,6 +25,7 @@ export const adminSidebarItems : ISidebarItem[] = [
           title: "Manage All Users",
           url: "/admin/manageusers",
           component:ManageAllUsers,
+          
         },
         {
           title: "Manage All Parcels",

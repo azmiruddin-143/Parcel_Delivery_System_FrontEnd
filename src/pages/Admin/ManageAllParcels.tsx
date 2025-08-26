@@ -45,6 +45,7 @@ import {
 import { StatusUpdateForm } from "./StatusUpdateForm";
 import { Parcel } from "@/type";
 import toast from "react-hot-toast";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 
 // This type definition must be consistent across all files
 // type Parcel = { ... }
@@ -243,7 +244,7 @@ const ManageAllParcels = () => {
     });
 
     if (isLoading) {
-        return <div className="p-4 text-center">Loading parcels...</div>;
+        return <LoadingSkeleton></LoadingSkeleton>
     }
 
     if (isError) {
@@ -379,7 +380,7 @@ const ManageAllParcels = () => {
                         </DialogDescription>
                     </DialogHeader>
                     {singleParcelLoading ? (
-                        <div>Loading...</div>
+                       <LoadingSkeleton></LoadingSkeleton>
                     ) : singleParcel ? (
                         <div className="space-y-4">
                             <p><strong>Tracking ID:</strong> {singleParcel.trackingId}</p>

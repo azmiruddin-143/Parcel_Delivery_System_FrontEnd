@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 
 // Define the User type to match your console data
 type User = {
@@ -162,7 +163,7 @@ const ManageAllUsers = () => {
   });
 
   if (isLoading) {
-    return <div className="p-4 text-center">Loading users...</div>;
+    return <LoadingSkeleton></LoadingSkeleton>
   }
 
   if (isError) {

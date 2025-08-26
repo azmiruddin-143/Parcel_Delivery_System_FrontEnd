@@ -39,6 +39,7 @@ import { MoreHorizontal, ChevronDown, Edit, Trash } from "lucide-react";
 import { Parcel } from "@/type";
 import toast from "react-hot-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 // This type definition must be consistent across all files
 // type Parcel = { ... }
 
@@ -232,7 +233,7 @@ const ViewIncomingParcels = () => {
     });
 
     if (isLoading) {
-        return <div className="p-4 text-center">Loading parcels...</div>;
+          return <LoadingSkeleton></LoadingSkeleton>
     }
 
     if (isError) {
@@ -350,7 +351,7 @@ const ViewIncomingParcels = () => {
                         </DialogDescription>
                     </DialogHeader>
                     {singleParcelLoading ? (
-                        <div>Loading...</div>
+                         <LoadingSkeleton></LoadingSkeleton>
                     ) : singleParcel ? (
                         <div className="space-y-4">
                             <p><strong>Tracking ID:</strong> {singleParcel.trackingId}</p>
