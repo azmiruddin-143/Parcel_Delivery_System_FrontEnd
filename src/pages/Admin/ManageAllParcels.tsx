@@ -354,7 +354,7 @@ const ManageAllParcels = () => {
         onGlobalFilterChange: setGlobalFilter,
         initialState: {
             pagination: {
-                pageSize: 5,
+                pageSize: 10,
             },
         },
     });

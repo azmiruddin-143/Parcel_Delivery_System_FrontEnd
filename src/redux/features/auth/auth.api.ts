@@ -153,12 +153,21 @@ export const authApi = baseApi.injectEndpoints({
       invalidatesTags: ["Parcel"],
     }),
 
+    // --- নিউ মিউটেশন: পার্সেল আপডেট করা ---
+    updateParcel: builder.mutation({
+      query: ({ parcelId, data }) => ({
+        url: `/parcels/${parcelId}`,
+        method: "PATCH",
+        data: data,
+      }),
+      invalidatesTags: ["Parcel"],
+    }),
     deleteParcel: builder.mutation({
       query: (parcelId: string) => ({
         url: `/parcels/${parcelId}`,
-        method: 'DELETE', 
+        method: 'DELETE',
       }),
-      invalidatesTags: ['Parcel'], 
+      invalidatesTags: ['Parcel'],
     }),
 
     //  Recever//
@@ -235,6 +244,7 @@ export const {
   // Sender User
   useGetMyParcelsQuery,
   useCancelParcelMutation,
+  useUpdateParcelMutation,
   useDeleteParcelMutation,
 
   // Reciver
