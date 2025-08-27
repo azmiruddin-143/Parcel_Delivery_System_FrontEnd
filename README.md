@@ -1,30 +1,44 @@
-# React + TypeScript + Vite
+Parcel Delivery System
+<br>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a modern and reliable parcel delivery platform designed to provide a cohesive solution for users, delivery agents, and administrators. The platform streamlines the entire process from parcel booking and tracking to final delivery.
 
-Currently, two official plugins are available:
+<br>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Project Overview
+The Parcel Delivery System is a full-stack application built to manage a complete parcel delivery lifecycle. It serves three main types of users, each with a dedicated set of features:
 
-## Expanding the ESLint configuration
+Sender: Can book parcels, track their delivery status in real-time, and cancel a request if needed.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Receiver: Can view incoming parcels, confirm delivery, and track the status of their packages.
 
-- Configure the top-level `parserOptions` property like this:
+Admin: Has full control over the system, including managing all users and parcels, updating statuses, and monitoring overall operations.
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+The application's architecture is built on a robust backend and a modern, fully responsive frontend to ensure a seamless user experience.
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Technology Stack
+This project is built using a modern and powerful technology stack.
+
+Frontend
+React: For building a fast and dynamic user interface.
+
+TypeScript: To ensure type safety and enhance code reliability.
+
+Redux Toolkit Query (RTK Query): For efficient data fetching, caching, and state management.
+
+Shadcn UI: A collection of beautiful and accessible UI components.
+
+Tailwind CSS: For rapid and responsive styling.
+
+Backend
+Node.js & Express.js: For building a scalable and efficient server.
+
+MongoDB: Used as the primary NoSQL database.
+
+Mongoose: An Object Data Modeling (ODM) library for interacting with MongoDB.
+
+Zod: For robust server-side data validation.
+
+TypeScript: For a type-safe backend environment.
+
+Nodemailer: For sending emails (e.g., from the contact form).
