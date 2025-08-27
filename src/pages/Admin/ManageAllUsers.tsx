@@ -112,9 +112,9 @@ const columns: ColumnDef<User>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => alert(`View details for ${user.name}`)}>
+            {/* <DropdownMenuItem onClick={() => alert(`View details for ${user.name}`)}>
               View Details
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             <DropdownMenuSeparator />
             {user.status === "Active" ? (
               <DropdownMenuItem

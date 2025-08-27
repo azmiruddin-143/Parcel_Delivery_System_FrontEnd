@@ -51,7 +51,7 @@ const data = {
         {/* We create a SidebarGroup for each parent. */}
         {data.navMain.map((item) => (
           <SidebarGroup key={item.title}>
-            <SidebarGroupLabel className="text-xl my-5 font-bold text-primary">{item.title}</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-lg my-5 font-bold text-primary">{item.title}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {item.items.map((item) => (

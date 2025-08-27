@@ -52,26 +52,47 @@ import toast from "react-hot-toast";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { ParcelEditForm } from "../Sender/ParcelEditForm";
 
+// const getStatusBadgeVariant = (status: string) => {
+//     switch (status) {
+//         case "Requested":
+//             return "default";
+//         case "Delivered":
+//             return "secondary";
+//         case "Cancelled":
+//         case "Returned":
+//         case "Held":
+//             return "destructive";
+//         case "Approved":
+//         case "Dispatched":
+//         case "In Transit":
+//         case "Picked":
+//             return "default";
+//         default:
+//             return "outline";
+//     }
+// };
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
         case "Requested":
-            return "default";
+            return { backgroundColor: "bg-blue-100 dark:bg-blue-900", textColor: "text-blue-700 dark:text-blue-200" };
+        case "Approved":
+            return { backgroundColor: "bg-green-100 dark:bg-green-900", textColor: "text-green-700 dark:text-green-200" };
+        case "Dispatched":
+            return { backgroundColor: "bg-yellow-100 dark:bg-yellow-900", textColor: "text-yellow-700 dark:text-yellow-200" };
+        case "In Transit":
+            return { backgroundColor: "bg-purple-100 dark:bg-purple-900", textColor: "text-purple-700 dark:text-purple-200" };
+        case "Picked":
+            return { backgroundColor: "bg-teal-100 dark:bg-teal-900", textColor: "text-teal-700 dark:text-teal-200" };
         case "Delivered":
-            return "secondary";
+            return { backgroundColor: "bg-gray-200 dark:bg-gray-700", textColor: "text-gray-800 dark:text-gray-300" };
         case "Cancelled":
         case "Returned":
         case "Held":
-            return "destructive";
-        case "Approved":
-        case "Dispatched":
-        case "In Transit":
-        case "Picked":
-            return "default";
+            return { backgroundColor: "bg-red-100 dark:bg-red-900", textColor: "text-red-700 dark:text-red-200" };
         default:
-            return "outline";
+            return { backgroundColor: "bg-gray-100 dark:bg-gray-800", textColor: "text-gray-500 dark:text-gray-400" };
     }
 };
-
 const ViewAllCreatedParcels = () => {
     // Hooks must be called inside the component
     const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
@@ -84,6 +105,7 @@ const ViewAllCreatedParcels = () => {
         skip: !selectedParcelId,
     });
 
+    
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
     const [parcelToDeleteId, setParcelToDeleteId] = React.useState<string | null>(null);
     const [deleteParcel, { isLoading: isDeleting }] = useDeleteParcelMutation();
@@ -106,7 +128,7 @@ const ViewAllCreatedParcels = () => {
     const { data: allParcels, isLoading, isError } = useGetMyParcelsQuery(undefined);
     const [cancelParcel] = useCancelParcelMutation();
     const [globalFilter, setGlobalFilter] = React.useState("");
-    
+
     const handleCancel = async (parcelId: string) => {
         try {
             await cancelParcel(parcelId).unwrap();
@@ -141,36 +163,51 @@ const ViewAllCreatedParcels = () => {
         {
             accessorKey: "sender.name",
             header: "Sender Name",
-            cell: ({ row }) => <span>{row.original.sender.name}</span>,
+            cell: ({ row }) => <span>{row.original.sender?.name}</span>,
         },
         {
             accessorKey: "sender.email",
             header: "Sender Email",
-            cell: ({ row }) => <span>{row.original.sender.email}</span>,
+            cell: ({ row }) => <span>{row.original.sender?.email}</span>,
         },
         {
             accessorKey: "receiver.name",
             header: "Receiver Name",
-            cell: ({ row }) => <span>{row.original.receiver.name}</span>,
+            cell: ({ row }) => <span>{row.original.receiver?.name}</span>,
         },
         {
             accessorKey: "receiver.email",
             header: "Receiver Email",
-            cell: ({ row }) => <span>{row.original.receiver.email}</span>,
+            cell: ({ row }) => <span>{row.original.receiver?.email}</span>,
         },
         {
             accessorKey: "receiver.phone",
             header: "Receiver Phone",
-            cell: ({ row }) => <span>{row.original.receiver.phone}</span>,
+            cell: ({ row }) => <span>{row.original.receiver?.phone}</span>,
         },
+
         {
             accessorKey: "currentStatus",
             header: "Status",
             cell: ({ row }) => {
                 const status = row.getValue("currentStatus") as string;
-                return <Badge variant={getStatusBadgeVariant(status)}>{status}</Badge>;
+                const { backgroundColor, textColor } = getStatusBadgeVariant(status);
+
+                return (
+                    <Badge className={`${backgroundColor} ${textColor}`}>
+                        {status}
+                    </Badge>
+                );
             },
         },
+        // {
+        //     accessorKey: "currentStatus",
+        //     header: "Status",
+        //     cell: ({ row }) => {
+        //         const status = row.getValue("currentStatus") as string;
+        //         return <Badge variant={getStatusBadgeVariant(status)}>{status}</Badge>;
+        //     },
+        // },
         {
             accessorKey: "weight",
             header: "Weight (kg)",
@@ -217,7 +254,7 @@ const ViewAllCreatedParcels = () => {
                                         Cancel Parcel
                                     </DropdownMenuItem>
                                 )}
-                                
+
                                 <DropdownMenuSeparator />
 
                                 {canEditOrDelete && (
@@ -271,6 +308,8 @@ const ViewAllCreatedParcels = () => {
     }
 
     const singleParcel = singleParcelData?.data;
+
+    const singleParcelStatusColors = singleParcel ? getStatusBadgeVariant(singleParcel.currentStatus) : { backgroundColor: "", textColor: "" };
     return (
         <Card className="p-4">
             <CardHeader>
@@ -371,8 +410,8 @@ const ViewAllCreatedParcels = () => {
                     </Button>
                 </div>
             </CardContent>
-            
-            <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+
+            {/* <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle>Parcel Details</DialogTitle>
@@ -404,7 +443,48 @@ const ViewAllCreatedParcels = () => {
                         <div>Parcel details could not be loaded.</div>
                     )}
                 </DialogContent>
-                
+
+            </Dialog> */}
+
+
+            <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Parcel Details</DialogTitle>
+                        <DialogDescription>
+                            All details for the selected parcel.
+                        </DialogDescription>
+                    </DialogHeader>
+                    {singleParcelLoading ? (
+                        <LoadingSkeleton></LoadingSkeleton>
+                    ) : singleParcel ? (
+                        <div className="space-y-4">
+                            <p><strong>Tracking ID:</strong> {singleParcel.trackingId}</p>
+                            {/* এখানে className দিয়ে ডাইনামিক কালার যোগ করা হয়েছে */}
+                            <p>
+                                <strong>Status:</strong>
+                                <Badge className={`${singleParcelStatusColors.backgroundColor} ${singleParcelStatusColors.textColor}`}>
+                                    {singleParcel.currentStatus}
+                                </Badge>
+                            </p>
+                            <p><strong>Parcel Type:</strong> {singleParcel.parcelType}</p>
+                            <p><strong>Weight:</strong> {singleParcel.weight} kg</p>
+                            <p><strong>Delivery Address:</strong> {singleParcel.deliveryAddress}</p>
+                            <DropdownMenuSeparator />
+                            <h4 className="font-semibold">Sender Details</h4>
+                            <p><strong>Name:</strong> {singleParcel.sender?.name}</p>
+                            <p><strong>Email:</strong> {singleParcel.sender?.email}</p>
+                            <DropdownMenuSeparator />
+                            <h4 className="font-semibold">Receiver Details</h4>
+                            <p><strong>Name:</strong> {singleParcel.receiver?.name}</p>
+                            <p><strong>Email:</strong> {singleParcel.receiver?.email}</p>
+                            <p><strong>Phone:</strong> {singleParcel.receiver?.phone}</p>
+                            <p><strong>Address:</strong> {singleParcel.receiver?.address}</p>
+                        </div>
+                    ) : (
+                        <div>Parcel details could not be loaded.</div>
+                    )}
+                </DialogContent>
             </Dialog>
 
             {/* Edit Dialog এখানে আলাদাভাবে থাকবে */}
@@ -427,7 +507,7 @@ const ViewAllCreatedParcels = () => {
 
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <AlertDialogContent>
-                 
+
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
