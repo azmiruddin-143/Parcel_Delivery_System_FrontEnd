@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Package } from 'lucide-react';
+import { Link } from 'react-router';
 
 interface CallToActionProps {
   headline: string;
@@ -23,10 +23,11 @@ const CallToAction: React.FC<CallToActionProps> = ({ headline, buttonText, butto
           </CardHeader>
           <CardContent className="p-0">
             <Button asChild size="lg" className="px-8 py-3 md:px-10 md:py-6 text-lg font-semibold rounded-full shadow-lg">
-              <a href={buttonLink} className="flex items-center space-x-2">
-                <Package className="h-5 w-5" />
-                <span>{buttonText}</span>
-              </a>
+              
+                {/* <Package className="h-5 w-5" /> */}
+              
+      
+              <Link className="flex items-center space-x-2" to={buttonLink}>{buttonText}</Link>
             </Button>
           </CardContent>
         </Card>

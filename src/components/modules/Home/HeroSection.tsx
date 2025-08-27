@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils'; // Shadcn-এর cn utility
+import { Link } from 'react-router';
 
 interface HeroSectionProps {
   title: string;
@@ -63,7 +64,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             isLoaded ? "opacity-100" : "opacity-0"
           )}
         >
-          <a href={buttonLink}>{buttonText}</a>
+          {/* <a href={buttonLink}>{buttonText}</a> */}
+          <Link to={buttonLink}>{buttonText}</Link>
         </Button>
       </div>
     </section>

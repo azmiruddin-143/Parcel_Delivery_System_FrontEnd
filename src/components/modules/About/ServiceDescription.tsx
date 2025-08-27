@@ -32,7 +32,7 @@ const ServiceDescription = () => {
           </Card>
           <Card className="flex flex-col items-center text-center p-6 transition-all duration-300 hover:scale-105">
             <CardHeader className="p-0 mb-4">
-              <Truck className="h-12 w-12 text-primary" />
+              <Truck className="h-12 w-12  text-primary" />
             </CardHeader>
             <CardContent className="p-0">
               <CardTitle className="mb-2 text-2xl font-bold">

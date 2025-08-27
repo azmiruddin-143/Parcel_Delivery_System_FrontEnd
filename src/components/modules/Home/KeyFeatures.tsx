@@ -41,8 +41,8 @@ const KeyFeatures = () => {
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {features.map((feature, index) => (
             <Card key={index} className="flex flex-col items-center p-6 text-center transition-all duration-300 hover:scale-105">
-              <CardHeader className="p-0 mb-4">
-                <div className="flex items-center justify-center rounded-full bg-primary/10 p-4">
+              <CardHeader className="flex items-center justify-center p-0 mb-4">
+                <div className="rounded-full bg-primary/10 p-4">
                   {feature.icon}
                 </div>
               </CardHeader>
