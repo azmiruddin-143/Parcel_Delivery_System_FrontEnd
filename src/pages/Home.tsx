@@ -1,11 +1,94 @@
+// src/pages/HomePage.tsx
 
+import HeroSection from '@/components/modules/Home/HeroSection';
+import heroBackground from '../assets/images/travel-register.jpg'; 
+import HowItWorks from '@/components/modules/Home/HowItWorks';
+import KeyFeatures from '@/components/modules/Home/KeyFeatures';
+import Testimonials from '@/components/modules/Home/Testimonials';
+import CallToAction from '@/components/modules/Home/CallToAction';
 
 const Home = () => {
     return (
         <div>
-            <h1>Home Page Create</h1>
+            {/* Your Hero Section goes here */}
+            <HeroSection
+                title="Your Fast and Reliable Parcel Delivery Partner"
+                subtitle="Deliver with confidence. Experience seamless, secure, and swift parcel delivery services tailored for your needs."
+                buttonText="Send Your Parcel Now"
+                buttonLink="/sender/parcelcreate"
+                backgroundImage={heroBackground} // Use the imported image variable
+            />
+            
+            {/* Your other homepage sections would go here */}
+            <HowItWorks />
+            <KeyFeatures/>
+            <Testimonials />
+
+             <CallToAction
+                headline="Start your first delivery with us today!"
+                buttonText="Book Your Parcel"
+                buttonLink="/sender/parcelcreate"
+            />
         </div>
     );
 };
 
 export default Home;
+
+
+
+
+
+
+
+
+
+
+// src/pages/HomePage.tsx
+
+// import HeroSection from '@/components/modules/Home/HeroSection';
+// import heroBackground from '../assets/images/travel-register.jpg'; // Path to your hero image
+// import { useUserInfoQuery } from "@/redux/features/auth/auth.api";
+// import { TRole } from '@/type';
+// import { LoadingSkeleton } from '@/components/LoadingSkeleton';
+
+// const Home = () => {
+//     // Fetch the current user's information
+//     const { data: userData, isLoading } = useUserInfoQuery(undefined);
+
+//     let buttonText = "Login";
+//     let buttonLink = "/login";
+    
+
+//     if (!isLoading && userData?.data) {
+//         const userRole = userData.data.role as TRole;
+//         if (userRole === "Sender") {
+//             buttonText = "Send Your Parcel Now";
+//             buttonLink = "/sender/parcelcreate";
+//         } else if (userRole === "Receiver") {
+//             buttonText = "View Incoming Parcels";
+//             buttonLink = "/receiver/viewincomingparcels";
+//         }
+//     }
+
+//     if (isLoading) {
+//         return <LoadingSkeleton></LoadingSkeleton>;
+//     }
+
+//     return (
+//         <div>
+//             {/* The HeroSection component now uses the dynamic props */}
+//             <HeroSection
+//                 title="Your Fast and Reliable Parcel Delivery Partner"
+//                 subtitle="Deliver with confidence. Experience seamless, secure, and swift parcel delivery services tailored for your needs."
+//                 buttonText={buttonText}
+//                 buttonLink={buttonLink}
+//                 backgroundImage={heroBackground}
+//             />
+            
+//             {/* Your other homepage sections would go here */}
+//         </div>
+//     );
+// };
+
+// export default Home;

@@ -15,6 +15,8 @@ import { TRole } from "@/type";
 import ErrorPage from "../pages/ErrorPage";
 import { withPublicRoute } from "@/utils/withPublicRoute";
 import ProfilePage from "@/pages/MyProfile/ProfilePage";
+import Home from "@/pages/Home";
+
 export const router = createBrowserRouter([
 
     {
@@ -23,9 +25,14 @@ export const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         children: [
             {
+                index: true,
+                Component: Home
+            },
+            {
                 path: "about",
                 Component: withAuth(About),
             },
+            
         ],
     },
 

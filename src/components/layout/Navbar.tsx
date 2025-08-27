@@ -19,9 +19,9 @@ import { role } from "@/constants/role"
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
-  { href: "#", label: "Home", active: true, role: "Publish" },
-  { href: "#", label: "About", role: "Publish" },
-  { href: "#", label: "Contact Us", role: "Publish" },
+  { href: "/", label: "Home", active: true, role: "Publish" },
+  { href: "about", label: "About", role: "Publish" },
+  { href: "contact", label: "Contact Us", role: "Publish" },
   { href: "admin", label: "Dashboard", role: role.Admin },
   { href: "sender", label: "Dashboard", role: role.Sender },
   { href: "receiver", label: "Dashboard", role: role.Receiver },
@@ -39,9 +39,8 @@ export default function Navbar() {
     dispatch(authApi.util.resetApiState())
   }
 
-
   return (
-    <header className="border-b px-4 md:px-6">
+    <header className="border-b px-4 md:px-6 container mx-auto">
 
       <div className="flex h-16 items-center justify-between gap-4">
         {/* Left side */}
@@ -171,3 +170,4 @@ export default function Navbar() {
     </header>
   )
 }
+
