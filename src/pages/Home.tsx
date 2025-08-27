@@ -38,14 +38,8 @@
 
 
 
-
-
-
-
-
-
 import HeroSection from '@/components/modules/Home/HeroSection';
-import heroBackground from '../assets/images/travel-register.jpg'; // Path to your hero image
+import heroBackground from '../assets/images/parce-bannr.jpg'; // Path to your hero image
 import HowItWorks from '@/components/modules/Home/HowItWorks';
 import KeyFeatures from '@/components/modules/Home/KeyFeatures';
 import Testimonials from '@/components/modules/Home/Testimonials';
