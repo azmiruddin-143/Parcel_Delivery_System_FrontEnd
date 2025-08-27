@@ -5,6 +5,15 @@ import { IResponse, ISendOtp, IVerifyOtp } from "@/type";
 export const authApi = baseApi.injectEndpoints({
 
   endpoints: (builder) => ({
+
+    logout: builder.mutation({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST", // 
+      }),
+      invalidatesTags: ["User"],
+    }),
+
     login: builder.mutation({
       query: (userInfo) => ({
         url: "/auth/login",
@@ -12,13 +21,8 @@ export const authApi = baseApi.injectEndpoints({
         data: userInfo,
       }),
     }),
-    logout: builder.mutation({
-      query: () => ({
-        url: "/auth/logout",
-        method: "POST",
-      }),
-      invalidatesTags: ["User"],
-    }),
+
+
     register: builder.mutation({
       query: (userInfo) => ({
         url: "/users/register",
@@ -219,12 +223,12 @@ export const authApi = baseApi.injectEndpoints({
       query: ({ id, body }) => ({
         url: `/users/${id}`,
         method: "PATCH",
-        body: body, 
+        body: body,
       }),
       invalidatesTags: ["User"],
     }),
 
-    
+
     changePassword: builder.mutation({
       query: (data) => ({
         url: "/auth/reset-password",
